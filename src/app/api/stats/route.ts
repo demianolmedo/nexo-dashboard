@@ -2,7 +2,12 @@ import { prisma } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
 
 export async function GET() {
+  console.log('=== API /api/stats called ===')
+  console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL)
+  console.log('DATABASE_URL host:', process.env.DATABASE_URL?.split('@')[1]?.split('/')[0] || 'unknown')
+  
   try {
+    console.log('Fetching data from database...')
     const [
       totalLeads,
       leadsWithWhatsapp,
@@ -53,6 +58,14 @@ export async function GET() {
       `
     ])
 
+    console.log('=== Data fetched successfully ===')
+    console.log('totalLeads:', totalLeads)
+    console.log('leadsWithWhatsapp:', leadsWithWhatsapp)
+    console.log('contactedToday:', contactedToday)
+    console.log('leadsByStatus:', JSON.stringify(leadsByStatus))
+    console.log('recentLeads count:', recentLeads.length)
+    console.log('leadsPerDay:', JSON.stringify(leadsPerDay))
+
     // Normalize status counts (case-insensitive) - handles 'nuevo' vs 'Nuevo'
     const statusCounts = leadsByStatus.reduce((acc, item) => {
       const normalizedStatus = (item.status || 'Sin status').toLowerCase()
@@ -65,7 +78,7 @@ export async function GET() {
       value: item._count.id
     }))
 
-    return NextResponse.json({
+    const response = {
       kpis: {
         totalLeads,
         leadsWithWhatsapp,
@@ -81,7 +94,13 @@ export async function GET() {
       leadsByNiche: nicheCounts,
       recentLeads,
       leadsPerDay
-    })
+    }
+    
+    console.log('=== Response being sent ===')
+    console.log('funnel:', JSON.stringify(response.funnel))
+    console.log('kpis:', JSON.stringify(response.kpis))
+    
+    return NextResponse.json(response)
   } catch (error) {
     console.error('Stats error:', error)
     // Return empty data structure so frontend doesn't crash
