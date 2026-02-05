@@ -53,8 +53,10 @@ export async function GET() {
       `
     ])
 
+    // Normalize status counts (case-insensitive) - handles 'nuevo' vs 'Nuevo'
     const statusCounts = leadsByStatus.reduce((acc, item) => {
-      acc[item.status || 'Sin status'] = item._count.id
+      const normalizedStatus = (item.status || 'Sin status').toLowerCase()
+      acc[normalizedStatus] = (acc[normalizedStatus] || 0) + item._count.id
       return acc
     }, {} as Record<string, number>)
 
@@ -71,10 +73,10 @@ export async function GET() {
         responseRate: totalLeads > 0 ? Math.round((contactedToday / totalLeads) * 100) : 0
       },
       funnel: {
-        nuevo: statusCounts['Nuevo'] || 0,
-        contactado: statusCounts['Contactado'] || 0,
-        interesado: statusCounts['Interesado'] || 0,
-        cliente: statusCounts['Cliente'] || 0
+        nuevo: statusCounts['nuevo'] || 0,
+        contactado: statusCounts['contactado'] || 0,
+        interesado: statusCounts['interesado'] || 0,
+        cliente: statusCounts['cliente'] || 0
       },
       leadsByNiche: nicheCounts,
       recentLeads,
