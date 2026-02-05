@@ -101,9 +101,18 @@ export async function GET() {
     console.log('kpis:', JSON.stringify(response.kpis))
     
     return NextResponse.json(response)
-  } catch (error) {
-    console.error('Stats error:', error)
-    // Return empty data structure so frontend doesn't crash
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    const errorName = error instanceof Error ? error.name : 'Unknown'
+    const errorStack = error instanceof Error ? error.stack : ''
+    
+    console.error('=== STATS ERROR ===')
+    console.error('Error name:', errorName)
+    console.error('Error message:', errorMessage)
+    console.error('Error stack:', errorStack)
+    console.error('DATABASE_URL:', process.env.DATABASE_URL?.replace(/:[^:@]+@/, ':***@') || 'NOT SET')
+    
+    // Return error details in response for debugging
     return NextResponse.json({
       kpis: {
         totalLeads: 0,
@@ -120,7 +129,12 @@ export async function GET() {
       leadsByNiche: [],
       recentLeads: [],
       leadsPerDay: [],
-      error: 'Database connection failed - check DATABASE_URL'
+      debug: {
+        error: errorMessage,
+        errorName: errorName,
+        databaseUrlSet: !!process.env.DATABASE_URL,
+        databaseHost: process.env.DATABASE_URL?.split('@')[1]?.split('/')[0] || 'unknown'
+      }
     })
   }
 }
