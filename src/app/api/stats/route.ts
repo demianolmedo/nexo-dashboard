@@ -49,13 +49,13 @@ export async function GET() {
           created_at: true
         }
       }),
-      prisma.$queryRaw`
+      prisma.$queryRaw<{date: Date, count: bigint}[]>`
         SELECT DATE(created_at) as date, COUNT(*) as count 
         FROM leads 
         WHERE created_at >= NOW() - INTERVAL '30 days'
         GROUP BY DATE(created_at) 
         ORDER BY date
-      `
+      `.then(rows => rows.map(r => ({ date: r.date, count: Number(r.count) })))
     ])
 
     console.log('=== Data fetched successfully ===')
