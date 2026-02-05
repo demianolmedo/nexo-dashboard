@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Lead {
+  id           Int       @id @default(autoincrement())
+  name         String    @db.VarChar(255)
+  phone        String?   @db.VarChar(50)
+  whatsapp     String?   @db.VarChar(50)
+  email        String?   @db.VarChar(255)
+  city         String?   @db.VarChar(100)
+  address      String?
+  website      String?   @db.VarChar(500)
+  facebook     String?   @db.VarChar(500)
+  instagram    String?   @db.VarChar(500)
+  niche        String?   @db.VarChar(100)
+  status       String?   @default("Nuevo") @db.VarChar(50)
+  priority     String?   @default("Media") @db.VarChar(20)
+  source       String?   @db.VarChar(100)
+  pain_point   String?
+  notes        String?
+  next_action  String?
+  last_contact DateTime?
+  created_at   DateTime? @default(now())
+  updated_at   DateTime? @default(now()) @updatedAt
+
+  interactions Interaction[]
+
+  @@map("leads")
+}
+
+model Interaction {
+  id         Int      @id @default(autoincrement())
+  lead_id    Int
+  type       String?  @db.VarChar(50)
+  direction  String?  @db.VarChar(20)
+  content    String?
+  created_at DateTime? @default(now())
+
+  lead Lead @relation(fields: [lead_id], references: [id])
+
+  @@map("interactions")
+}
