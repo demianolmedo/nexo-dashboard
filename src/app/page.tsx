@@ -2,10 +2,19 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { 
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+import {
+  Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell
 } from 'recharts'
+
+interface RecentLead {
+  id: string
+  name: string
+  city: string | null
+  niche: string | null
+  status: string
+  whatsapp: string | null
+}
 
 interface Stats {
   kpis: {
@@ -21,7 +30,7 @@ interface Stats {
     cliente: number
   }
   leadsByNiche: { name: string; value: number }[]
-  recentLeads: any[]
+  recentLeads: RecentLead[]
   leadsPerDay: { date: string; count: number }[]
 }
 
