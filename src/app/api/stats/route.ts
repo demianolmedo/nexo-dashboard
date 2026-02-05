@@ -82,6 +82,24 @@ export async function GET() {
     })
   } catch (error) {
     console.error('Stats error:', error)
-    return NextResponse.json({ error: 'Failed to fetch stats' }, { status: 500 })
+    // Return empty data structure so frontend doesn't crash
+    return NextResponse.json({
+      kpis: {
+        totalLeads: 0,
+        leadsWithWhatsapp: 0,
+        contactedToday: 0,
+        responseRate: 0
+      },
+      funnel: {
+        nuevo: 0,
+        contactado: 0,
+        interesado: 0,
+        cliente: 0
+      },
+      leadsByNiche: [],
+      recentLeads: [],
+      leadsPerDay: [],
+      error: 'Database connection failed - check DATABASE_URL'
+    })
   }
 }
